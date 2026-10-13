@@ -1,16 +1,5 @@
 import java.util.Random;
 
-/**
- * Handles the application logic for Passing the Plunger: roommates,
- * chores, random scheduling, swapping, and weekly rotation.
- *
- * All storage goes through LinkedChain. Every method that can fail
- * returns false (or null) and stores a message that ChoreApp displays,
- * available from getLastMessage().
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class ChoreManager
 {
     private LinkedChain<ChoreAssignment> assignments;

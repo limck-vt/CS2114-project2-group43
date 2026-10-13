@@ -5,13 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests for the provided LinkedChain, following the spec's LinkedChain
- * test plan. These confirm the storage behavior the app relies on.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class LinkedChainTest
 {
     private LinkedChain<String> chain;

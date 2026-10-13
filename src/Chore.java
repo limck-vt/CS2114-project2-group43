@@ -1,10 +1,3 @@
-/**
- * One chore that needs to be done, with its name and priority.
- * Chores are stored in a LinkedChain until a schedule is created.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class Chore
 {
     private String name;

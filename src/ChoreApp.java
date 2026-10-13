@@ -1,13 +1,5 @@
 import java.util.Scanner;
 
-/**
- * The console interface for Passing the Plunger. Shows the menu, reads
- * user input, calls ChoreManager, and displays results and errors.
- * Invalid menu input shows an error and the menu again.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class ChoreApp
 {
     private ChoreManager manager;

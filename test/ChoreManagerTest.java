@@ -7,14 +7,6 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests for ChoreManager, following the spec's test plan, detailed swap
- * test, and invalid swap tests. Each public method has a normal case and
- * a bad-input or edge case.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class ChoreManagerTest
 {
     private ChoreManager manager;

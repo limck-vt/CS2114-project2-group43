@@ -8,13 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests for ChoreApp, following the spec's ChoreApp test plan. Input is
- * given as text, and the console output is captured and checked.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class ChoreAppTest
 {
     private PrintStream originalOut;

@@ -5,13 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests for Chore. Each public method has a normal case and a bad or
- * edge case.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class ChoreTest
 {
     private Chore dishes;

@@ -1,12 +1,3 @@
-/**
- * One chore assignment: a roommate, the chore they are responsible for,
- * and that chore's priority. For example: John - Dishes - High.
- *
- * Input is validated by ChoreManager before an assignment is created.
- *
- * @author Isaac, Liam, Nathaniel
- * @version October 2026
- */
 public class ChoreAssignment
 {
     private String roommate;
