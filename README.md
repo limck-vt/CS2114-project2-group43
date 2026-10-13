@@ -58,16 +58,16 @@ New tests needed
 
 Attribution
 
-LinkedChain.java | CS 2114 Staff 
-Chore.java | Liam
-ChoreAssignment.java | Nathaniel
-ChoreManager.java | Isaac
-ChoreApp.java | Isaac
-LinkedChainTest.java | Liam
-ChoreTest.java | Liam
-ChoreAssignmentTest.java | Nathaniel
-ChoreManagerTest.java | Isaac
-ChoreAppTest.java | Nathaniel
+- LinkedChain.java | CS 2114 Staff 
+- Chore.java | Liam
+- ChoreAssignment.java | Nathaniel
+- ChoreManager.java | Isaac
+- ChoreApp.java | Isaac
+- LinkedChainTest.java | Liam
+- ChoreTest.java | Liam
+- ChoreAssignmentTest.java | Nathaniel
+- ChoreManagerTest.java | Isaac
+- ChoreAppTest.java | Nathaniel
 
 GenAI note
 - We used Claude from Anthropic to assist in finding gaps with testing, ensuring out tests cover what they need to. We wrote the tests ourselves but had it give suggestions on what else we need to add.
