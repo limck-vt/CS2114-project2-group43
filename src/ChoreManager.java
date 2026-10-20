@@ -5,6 +5,7 @@ public class ChoreManager
     private LinkedChain<ChoreAssignment> assignments;
     private LinkedChain<String> roommates;
     private LinkedChain<Chore> chores;
+    private LinkedChain<String> history;
     private Random random;
     private int week;
     private String lastMessage;
@@ -29,6 +30,7 @@ public class ChoreManager
         assignments = new LinkedChain<ChoreAssignment>();
         roommates = new LinkedChain<String>();
         chores = new LinkedChain<Chore>();
+        history = new LinkedChain<String>();
         this.random = random;
         week = 0;
         lastMessage = "";
@@ -44,7 +46,21 @@ public class ChoreManager
     {
         return lastMessage;
     }
-
+    
+    private void sortByPointsDescending(Chore[] list)
+    {
+        for (int i = 1; i < list.length; i++)
+        {
+            Chore item = list[i];
+            int j = i - 1;
+            while (j >= 0 && list[j].getPoints() < item.getPoints())
+            {
+                list[j + 1] = list[j];
+                j--;
+            }
+            list[j + 1] = item;
+        }
+    }
     /**
      * Adds a roommate. Empty and duplicate names are rejected.
      *
@@ -274,15 +290,27 @@ public class ChoreManager
         }
         String[] names = roommateArray();
         Chore[] allChores = choreArray();
+        sortByPointsDescending(allChores);
+        int[] totals = new int[names.length];
         int start = random.nextInt(names.length);
         assignments.clear();
         for (int i = 0; i < allChores.length; i++)
         {
-            String roommate = names[(start + i) % names.length];
-            assignments.addToEnd(new ChoreAssignment(roommate,
+            int best = start;
+            for (int k = 1; k < names.length; k++)
+            {
+                int candidate = (start + k) % names.length;
+                if (totals[candidate] < totals[best])
+                {
+                    best = candidate;
+                }
+            }
+            totals[best] += allChores[i].getPoints();
+            assignments.addToEnd(new ChoreAssignment(names[best],
                 allChores[i].getName(), allChores[i].getPriority()));
         }
         week++;
+        recordHistory("created");
         lastMessage = "Schedule created for week " + week + ".";
         return true;
     }
@@ -351,6 +379,7 @@ public class ChoreManager
         first.setPriority(second.getPriority());
         second.setChore(tempChore);
         second.setPriority(tempPriority);
+        recordHistory("swap");
         lastMessage = "Swapped chores between " + first.getRoommate()
             + " and " + second.getRoommate() + ".";
         return true;
@@ -381,6 +410,7 @@ public class ChoreManager
                 current[i].getChore(), current[i].getPriority()));
         }
         week++;
+        recordHistory("rotated");
         lastMessage = "Schedule rotated to week " + week + ".";
         return true;
     }
@@ -476,6 +506,22 @@ public class ChoreManager
     {
         return assignments.size();
     }
+    public int getHistoryCount()
+    {
+    return history.size();
+    }
+
+    /**
+     * Gets one saved snapshot, oldest first.
+     *
+     * @param index the zero-based position
+     * @return the snapshot text
+     * @throws IndexOutOfBoundsException if index is not valid
+     */
+    public String getHistoryEntry(int index)
+    {
+    return history.get(index);
+    }
 
     /**
      * Checks whether a roommate exists.
@@ -517,7 +563,15 @@ public class ChoreManager
     {
         return chores.toArray(new Chore[chores.size()]);
     }
-
+    /**
+     * Saves a snapshot of the current schedule.
+     *
+     * @param event what just happened, such as "created"
+     */
+    private void recordHistory(String event)
+    {
+        history.addToEnd("Week " + week + " (" + event + "): " + assignments);
+    }
     /**
      * Finds the position of a name in an array.
      *
