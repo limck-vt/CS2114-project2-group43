@@ -142,9 +142,12 @@ public class ChoreApp
                 displaySchedule();
                 return true;
             case 5:
+                displaySchedule();
                 String first = readLine("First roommate: ");
+                String firstChore = readLine("Which of their chores: ");
                 String second = readLine("Second roommate: ");
-                if (manager.swapAssignments(first, second))
+                String secondChore = readLine("Which of their chores: ");
+                if (manager.swapAssignments(first, firstChore, second, secondChore))
                 {
                     System.out.println(manager.getLastMessage());
                     displaySchedule();
