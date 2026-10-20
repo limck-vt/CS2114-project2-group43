@@ -74,6 +74,18 @@ public class ChoreAssignment
         this.priority = priority;
     }
 
+    public int getPoints()
+    {
+    if (priority.equals("High"))
+    {
+        return 3;
+    }
+    if (priority.equals("Medium"))
+    {
+        return 2;
+    }
+    return 1;
+    }
     /**
      * Returns a readable assignment, such as "John - Dishes - High".
      *
