@@ -72,7 +72,8 @@ public class ChoreApp
         System.out.println("6. Rotate Schedule");
         System.out.println("7. Remove Roommate");
         System.out.println("8. Remove Chore");
-        System.out.println("9. Exit");
+        System.out.println("9. View History");
+        System.out.println("10. Exit");
     }
 
     /**
@@ -102,6 +103,19 @@ public class ChoreApp
         }
     }
 
+    public void displayHistory()
+{
+    int count = manager.getHistoryCount();
+    if (count == 0)
+    {
+        System.out.println("No history yet. Create a schedule first.");
+        return;
+    }
+    for (int i = 0; i < count; i++)
+    {
+        System.out.println(manager.getHistoryEntry(i));
+    }
+}
     /**
      * Runs the action for one menu choice.
      *
@@ -117,7 +131,7 @@ public class ChoreApp
         }
         catch (NumberFormatException e)
         {
-            System.out.println("Invalid choice. Enter a number from 1 to 9.");
+            System.out.println("Invalid choice. Enter a number from 1 to 10.");
             return true;
         }
         switch (choice)
@@ -169,9 +183,12 @@ public class ChoreApp
                 manager.removeChore(readLine("Chore to remove: "));
                 break;
             case 9:
+                displayHistory();
+                return true;
+            case 10:
                 return false;
             default:
-                System.out.println("Invalid choice. Enter a number from 1 to 9.");
+                System.out.println("Invalid choice. Enter a number from 1 to 10.");
                 return true;
         }
         System.out.println(manager.getLastMessage());
