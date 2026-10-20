@@ -35,6 +35,18 @@ public class Chore
         return priority;
     }
 
+    public int getPoints()
+    {
+    if (priority.equals("High"))
+    {
+        return 3;
+    }
+    if (priority.equals("Medium"))
+    {
+        return 2;
+    }
+    return 1;
+}
     /**
      * Returns the chore as readable text, such as "Dishes (High)".
      *
