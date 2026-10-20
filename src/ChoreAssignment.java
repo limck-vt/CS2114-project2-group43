@@ -48,6 +48,11 @@ public class ChoreAssignment
         return priority;
     }
 
+    public void setRoommate(String roommate)
+    {
+        this.roommate = roommate;
+    }
+
     /**
      * Changes the chore during an approved swap.
      *
