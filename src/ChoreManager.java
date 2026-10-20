@@ -59,13 +59,23 @@ public class ChoreManager
             return false;
         }
         String trimmed = name.trim();
-        if (roommates.contains(trimmed))
+        if (findRoommate(trimmed) != null)
         {
             lastMessage = "Roommate already exists.";
             return false;
         }
         roommates.addToEnd(trimmed);
         lastMessage = "Added roommate " + trimmed + ".";
+        if (!assignments.isEmpty())
+        {
+            String busiest = busiestRoommate();
+            if (countFor(busiest) > 1)
+            {
+                ChoreAssignment toMove = lastAssignmentOf(busiest);
+                toMove.setRoommate(trimmed);
+                lastMessage += " Gave them " + toMove.getChore() + ".";
+            }
+        }
         return true;
     }
 
@@ -101,9 +111,16 @@ public class ChoreManager
             lastMessage = "Priority must be High, Medium, or Low.";
             return false;
         }
-        chores.add(new Chore(chore.trim(), validPriority));
-        lastMessage = "Added chore " + chore.trim() + " (" + validPriority
-            + ").";
+        String name = chore.trim();
+        chores.add(new Chore(name, validPriority));
+        lastMessage = "Added chore " + name + " (" + validPriority + ").";
+        if (!assignments.isEmpty())
+        {
+            String roommate = leastBusyRoommate();
+            assignments.addToEnd(new ChoreAssignment(roommate, name,
+                validPriority));
+            lastMessage += " Assigned to " + roommate + ".";
+        }
         return true;
     }
 
@@ -116,22 +133,62 @@ public class ChoreManager
      */
     public boolean removeRoommate(String name)
     {
-        if (isBlank(name) || !roommates.remove(name.trim()))
+        String stored = findRoommate(name);
+        if (stored == null)
         {
             lastMessage = "Roommate not found.";
             return false;
         }
-        String trimmed = name.trim();
+        roommates.remove(stored);
+        if (roommates.isEmpty())
+        {
+            assignments.clear();
+            lastMessage = "Removed roommate " + stored
+                + ". No roommates left, so the schedule was cleared.";
+            return true;
+        }
+        int moved = 0;
         ChoreAssignment[] current = assignmentArray();
         for (int i = 0; i < current.length; i++)
         {
-            if (current[i].getRoommate().equals(trimmed))
+            if (current[i].getRoommate().equals(stored))
             {
-                assignments.remove(current[i]);
+                current[i].setRoommate(leastBusyRoommate());
+                moved++;
             }
         }
-        lastMessage = "Removed roommate " + trimmed + ".";
+        lastMessage = "Removed roommate " + stored + ".";
+        if (moved > 0)
+        {
+            lastMessage += " Reassigned " + moved + " chore(s).";
+        }
         return true;
+    }
+
+    /**
+     * Finds a specific chore belonging to a roommate.
+     *
+     * @param roommate the roommate
+     * @param chore the chore name (any capitalization)
+     * @return the assignment, or null if the roommate doesn't have it
+     */
+    public ChoreAssignment findAssignment(String roommate, String chore)
+    {
+        String stored = findRoommate(roommate);
+        if (stored == null || isBlank(chore))
+        {
+            return null;
+        }
+        ChoreAssignment[] current = assignmentArray();
+        for (int i = 0; i < current.length; i++)
+        {
+            if (current[i].getRoommate().equals(stored)
+                && current[i].getChore().equalsIgnoreCase(chore.trim()))
+            {
+                return current[i];
+            }
+        }
+        return null;
     }
 
     /**
@@ -176,6 +233,23 @@ public class ChoreManager
         }
         lastMessage = "Removed chore " + trimmed + ".";
         return true;
+    }
+
+        /**
+     * Finds the last assignment belonging to a roommate.
+     */
+    private ChoreAssignment lastAssignmentOf(String roommate)
+    {
+        ChoreAssignment[] current = assignmentArray();
+        ChoreAssignment result = null;
+        for (int i = 0; i < current.length; i++)
+        {
+            if (current[i].getRoommate().equals(roommate))
+            {
+                result = current[i];
+            }
+        }
+        return result;
     }
 
     /**
@@ -224,28 +298,51 @@ public class ChoreManager
      */
     public boolean swapAssignments(String roommate1, String roommate2)
     {
+        if (!canSwap(roommate1, roommate2))
+        {
+            return false;
+        }
+        return swap(findAssignment(roommate1), findAssignment(roommate2));
+    }
+
+    public boolean swapAssignments(String roommate1, String chore1,
+        String roommate2, String chore2)
+    {
+        if (!canSwap(roommate1, roommate2))
+        {
+            return false;
+        }
+        return swap(findAssignment(roommate1, chore1),
+            findAssignment(roommate2, chore2));
+    }
+
+    private boolean canSwap(String roommate1, String roommate2)
+    {
         if (assignments.isEmpty())
         {
             lastMessage = "Create a schedule first.";
             return false;
         }
-        if (isBlank(roommate1) || isBlank(roommate2)
-            || !roommates.contains(roommate1.trim())
-            || !roommates.contains(roommate2.trim()))
+        String stored1 = findRoommate(roommate1);
+        String stored2 = findRoommate(roommate2);
+        if (stored1 == null || stored2 == null)
         {
             lastMessage = "Roommate not found.";
             return false;
         }
-        if (roommate1.trim().equals(roommate2.trim()))
+        if (stored1.equals(stored2))
         {
             lastMessage = "A roommate cannot swap with themselves.";
             return false;
         }
-        ChoreAssignment first = findAssignment(roommate1);
-        ChoreAssignment second = findAssignment(roommate2);
+        return true;
+    }
+
+    private boolean swap(ChoreAssignment first, ChoreAssignment second)
+    {
         if (first == null || second == null)
         {
-            lastMessage = "Both roommates need a chore to swap.";
+            lastMessage = "Both roommates need that chore to swap.";
             return false;
         }
         String tempChore = first.getChore();
@@ -297,14 +394,15 @@ public class ChoreManager
      */
     public ChoreAssignment findAssignment(String roommate)
     {
-        if (isBlank(roommate))
+        String stored = findRoommate(roommate);
+        if (stored == null)
         {
             return null;
         }
         ChoreAssignment[] current = assignmentArray();
         for (int i = 0; i < current.length; i++)
         {
-            if (current[i].getRoommate().equals(roommate.trim()))
+            if (current[i].getRoommate().equals(stored))
             {
                 return current[i];
             }
@@ -387,7 +485,7 @@ public class ChoreManager
      */
     public boolean hasRoommate(String name)
     {
-        return !isBlank(name) && roommates.contains(name.trim());
+        return findRoommate(name) != null;
     }
 
     /**
@@ -476,5 +574,82 @@ public class ChoreManager
     private boolean isBlank(String text)
     {
         return text == null || text.trim().isEmpty();
+    }
+
+    private String findRoommate(String name)
+{
+    if (isBlank(name))
+    {
+        return null;
+    }
+    String trimmed = name.trim();
+    String[] names = roommateArray();
+    for (int i = 0; i < names.length; i++)
+    {
+        if (names[i].equalsIgnoreCase(trimmed))
+        {
+            return names[i];
+        }
+    }
+    return null;
+}
+
+    /**
+     * Counts how many chores a roommate has in the current schedule.
+     */
+    private int countFor(String roommate)
+    {
+        int total = 0;
+        ChoreAssignment[] current = assignmentArray();
+        for (int i = 0; i < current.length; i++)
+        {
+            if (current[i].getRoommate().equals(roommate))
+            {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Finds the roommate with the fewest chores (first one wins ties).
+     * Only call this when there is at least one roommate.
+     */
+    private String leastBusyRoommate()
+    {
+        String[] names = roommateArray();
+        String best = names[0];
+        int bestCount = countFor(best);
+        for (int i = 1; i < names.length; i++)
+        {
+            int count = countFor(names[i]);
+            if (count < bestCount)
+            {
+                best = names[i];
+                bestCount = count;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Finds the roommate with the most chores (first one wins ties).
+     * Only call this when there is at least one roommate.
+     */
+    private String busiestRoommate()
+    {
+        String[] names = roommateArray();
+        String best = names[0];
+        int bestCount = countFor(best);
+        for (int i = 1; i < names.length; i++)
+        {
+            int count = countFor(names[i]);
+            if (count > bestCount)
+            {
+                best = names[i];
+                bestCount = count;
+            }
+        }
+        return best;
     }
 }
